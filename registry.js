@@ -16,34 +16,35 @@ function serverListener(s) {
     });
 }
 
-
-
-var clientserv = net.createServer(clientListener);
-var clientserv2 = net.createServer(clientListener);
-var serverserv = net.createServer(serverListener);
+var clientserv = net.createServer(clientListener); 
+clientserv.potag = {name: "Client serv 1", port: 5090};
+var clientserv2 = net.createServer(clientListener); 
+clientserv2.potag = {name: "Client serv 2", port: 8080};
+var serverserv = net.createServer(serverListener); 
+serverserv.potag = {name: "Server serv", port: 8081};
 
 var servs = [clientserv, clientserv2, serverserv];
 
 servs.forEach(function(serv) {
     serv.on('error', function (e) {
         if (e.code == 'EADDRINUSE') {
-            console.log('Port in use, failure...');
-            // setTimeout(function () {
-            //     server.close();
-            //     server.listen(PORT, HOST);
-            // }, 1000);
+            console.log(serv.potag.name + ': Port ' + serv.potag.port + ' in use, failure... Retrying in 10 seconds');
+            setTimeout(function () {
+                 //serv.close();
+                 serv.listen(serv.potag.port);
+            }, 10000);
         }
     });
 });
 
-clientserv.listen(5090, function() { //'listening' listener
+clientserv.listen(clientserv.potag.port, function() { //'listening' listener
     console.log('Client listener 1 working on port 5090');
 });
 
-clientserv2.listen(8080, function() { //'listening' listener
+clientserv2.listen(clientserv2.potag.port, function() { //'listening' listener
     console.log('Client listener 2 working on port 8080');
 });
 
-serverserv.listen(8081, function() {
+serverserv.listen(serverserv.potag.port, function() {
     console.log("Server listener working on port 8081");
 });
