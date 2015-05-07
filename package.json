@@ -1,0 +1,22 @@
+{
+  "name": "po-registry",
+  "version": "0.0.0",
+  "description": "A simple registry for Pokemon Online",
+  "main": "registry.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/po-devs/po-registry"
+  },
+  "keywords": [
+    "pokemon-online",
+    "registry"
+  ],
+  "author": "coyotte508",
+  "license": "BSD-2-Clause",
+  "bugs": {
+    "url": "https://github.com/po-devs/po-registry/issues"
+  }
+}
