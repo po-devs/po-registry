@@ -48,7 +48,11 @@ function disconnect(s) {
 
 function BufferWrapper(buf) {
     this.offset = 0;
-    this.buf = buf;
+    if (typeof buf == "number") {
+        this.buf = new Buffer(buf);
+    } else {
+        this.buf = buf;
+    }
 }
 
 BufferWrapper.prototype.readBool = function() {
@@ -82,7 +86,32 @@ BufferWrapper.prototype.readString = function() {
     return str;
 };
 
+BufferWrapper.prototype.writeBool = function(data) {
+    this.buf.writeUInt8(data ? 1 : 0, this.offset++);
+};
+
+BufferWrapper.prototype.writeUInt8 = function(data) {
+    this.buf.writeUInt8(data, this.offset++);
+};
+
+BufferWrapper.prototype.writeUInt16 = function(data) {
+    this.buf.writeUInt16BE(data, this.offset);
+    this.offset += 2;
+};
+
+BufferWrapper.prototype.writeUInt32 = function(data) {
+    this.buf.writeUInt32BE(data, this.offset);
+    this.offset += 4;
+};
+
+BufferWrapper.prototype.writeString = function(data) {
+    var len = this.buf.write(data, this.offset+4);
+    this.buf.writeUInt32BE(len, this.offset);
+    this.offset += 4 + len;
+};
+
 var commandAnalyzers = {};
+var commandWriters = {};
 
 function analyze(s, fulldata, callback) {
     var buf = new BufferWrapper(fulldata);
@@ -141,7 +170,50 @@ commandAnalyzers[59] = function(buf) {
     };
 };
 
+function writeCommand(c, command, data) {
+    if (command in commandWriters) {
+        commandWriters[command](c, data);
+    } else {
+        console.log("Unknown command: " + command);
+    }
+}
+
+commandWriters["announcement"] = function (c, announcement) {
+    var strlen = Buffer.byteLength(announcement, "utf8");
+    var totallen = 4 + 1 + 4 + strlen;
+    var buf = new BufferWrapper(totallen);
+    buf.writeUInt32(totallen - 4);
+    buf.writeUInt8(38);
+    buf.writeString(announcement);
+    c.write(buf.buf);
+};
+
+commandWriters["server"] = function (c, server) {
+    var lens = Buffer.byteLength(server.name) + Buffer.byteLength(server.desc) + Buffer.byteLength(server.ip);
+    //    notify(PlayersList, name, desc, numplayers, ip, max, port, passwordProtected);
+    var totallen = 4+1+4+4+2+4+2+2+1+lens;
+    var buf = new BufferWrapper(totallen);
+    buf.writeUInt32(totallen - 4);
+    buf.writeUInt8(5);
+    buf.writeString(server.name);
+    buf.writeString(server.desc);
+    buf.writeUInt16(server.players);
+    buf.writeString(server.ip);
+    buf.writeUInt16(server.maxplayers);
+    buf.writeUInt16(server.port == 0 ? 5080 : server.port);
+    buf.writeBool(server["password-protected"]);
+    c.write(buf.buf);
+};
+
+commandWriters["serverend"] = function(c) {
+    var buf = new BufferWrapper(5);
+    buf.writeUInt32(1);
+    buf.writeUInt8(57);
+    c.write(buf.buf);
+};
+
 module.exports = {
     addData: addData,
-    disconnect: disconnect
+    disconnect: disconnect,
+    write: writeCommand
 };

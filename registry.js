@@ -26,8 +26,18 @@ function clientListener(c) {
     c.on('end', function() {
         console.log('client disconnected');
     });
-    //c.write('hello\r\n');
-    //c.pipe(c);  
+
+    if (announcement) {
+        analyze.write(c, "announcement", announcement);
+    }
+    //todo: cache the binary data?
+    for(name in names) {
+        analyze.write(c, "server", names[name].podata);
+    };
+
+    analyze.write(c, "serverend");
+
+    c.end();
 }
 
 function serverListener(s) {
@@ -46,7 +56,7 @@ function serverListener(s) {
         return;
     }
     servers[id] = s;
-    s.podata = {"name": ""};
+    s.podata = {"name": "", "ip": s.remoteAddress};
     s.setKeepAlive(true);
     s.on('end', function() {
         console.log('server ' + id + ' disconnected');
