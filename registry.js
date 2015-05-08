@@ -1,6 +1,7 @@
 var net = require('net');
 var redis = require("redis"),
     redisClient = redis.createClient();
+var analyze = require("./analyzepacket");
 
 var announcement = "";
 
@@ -35,9 +36,13 @@ function serverListener(s) {
     s.on('end', function() {
         console.log('server ' + id + ' disconnected');
         delete servers[id];
+        analyze.disconnect(s);
     });
     s.on('data', function(data) {
         console.log("Server " + id + " sent data of length " + data.length);
+        analyze.addData(s, data, function(s, command) {
+            console.log("Server " + id + " sent command " + command);
+        });
     });
 }
 

@@ -20,6 +20,7 @@
     "url": "https://github.com/po-devs/po-registry/issues"
   },
   "devDependencies": {
-    "redis": "~0.12.1"
+    "redis": "~0.12.1",
+    "simplesets": "~1.2.0"
   }
 }
