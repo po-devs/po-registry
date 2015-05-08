@@ -2,6 +2,7 @@ var net = require('net');
 var redis = require("redis"),
     redisClient = redis.createClient();
 var analyze = require("./analyzepacket");
+var extend = require("extend");
 
 var announcement = "";
 
@@ -11,14 +12,14 @@ redisClient.on("error", function (err) {
 
 
 var servers = {};
-
-function freeid(dataSet) {
-    for (var i = 1; ; i++) {
-        if (! (i in dataSet)) {
-            return i;
-        }
-    }
-}
+var names = {};
+// function freeid(dataSet) {
+//     for (var i = 1; ; i++) {
+//         if (! (i in dataSet)) {
+//             return i;
+//         }
+//     }
+// }
 
 function clientListener(c) {
     console.log('client connected');
@@ -30,19 +31,71 @@ function clientListener(c) {
 }
 
 function serverListener(s) {
-    var id = freeid(servers);
+    var id = s.remoteAddress;
     console.log("server " + id + " connected");
+
+    var disconnected = false;
+    function dc() {
+        disconnected = true;
+        s.end();
+    }
+    if (id in servers) {
+        //Todo: send error message to server
+        console.log("IP already in use, disconnecting");
+        dc();
+        return;
+    }
     servers[id] = s;
+    s.podata = {"name": ""};
     s.setKeepAlive(true);
     s.on('end', function() {
         console.log('server ' + id + ' disconnected');
         delete servers[id];
+        if (s.podata.name in names && names[s.podata.name] == s) {
+            delete names[s.podata.name];
+        }
         analyze.disconnect(s);
     });
     s.on('data', function(data) {
+        //Ignore data from connections we closed
+        if (disconnected) {
+            return;
+        }
         //console.log("Server " + id + " sent data of length " + data.length);
         analyze.addData(s, data, function(s, command) {
             console.log("Server " + id + " sent command " + JSON.stringify(command));
+
+            if ("name" in command && command.name.length > 20) {
+                command.name = command.name.substring(0, 20);
+            }
+            if ("desc" in command && command.desc.length > 500) {
+                command.desc = command.desc.substring(0, 500);
+            }
+
+            var oldName = s.podata.name;
+            extend(s.podata, command);
+
+            if (s.podata.name !== oldName) {
+                delete names[oldName];
+
+                if (s.podata.name in names) {
+                    console.log("Name already in use, disconnecting");
+                    //Todo: send error message to server
+                    dc();
+                    return;
+                }
+
+                if (s.podata.name.length > 0) {
+                    names[s.podata.name] = s;
+                }
+            }
+
+            if (s.podata.name.length == 0) {
+                console.log("Empty name, disconnecting");
+                //Todo: send error message to server
+                dc();
+                return;
+            }
         });
     });
 }

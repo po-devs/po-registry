@@ -5,7 +5,8 @@ var data = {};
 var disconnected = new sets.Set();
 
 function addData(s, newdata, callback) {
-    var fulldata = s in data ? Buffer.concat(data[s], newdata) : newdata;
+    var id = s.remoteAddress;
+    var fulldata = id in data ? Buffer.concat(data[id], newdata) : newdata;
     
     /* Todo: instead of creating a new buffer for each command, keep offset in memory and only
         create a new buffer every X or so bytes */
@@ -16,7 +17,7 @@ function addData(s, newdata, callback) {
         if (fulldata.length >= fullength) {
             analyze(s, fulldata, callback);
 
-            delete data[s];
+            delete data[id];
             
             if (fulldata.length == fullength) {
                 break;
@@ -27,7 +28,7 @@ function addData(s, newdata, callback) {
                 fulldata = newbuf;
             }
         } else {
-            data[s] = fulldata;
+            data[id] = fulldata;
             break;
         }
     }
@@ -40,7 +41,7 @@ function addData(s, newdata, callback) {
 
 function disconnect(s) {
     if (s in data) {
-        delete data[s];
+        delete data[s.remoteAddress];
     }
     disconnected.add(s);
 }
