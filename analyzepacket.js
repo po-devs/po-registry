@@ -50,9 +50,21 @@ function BufferWrapper(buf) {
     this.buf = buf;
 }
 
+BufferWrapper.prototype.readBool = function() {
+    var ret = this.buf.readUInt8(this.offset, true);
+    this.offset++;
+    return ret ? true : false;
+};
+
 BufferWrapper.prototype.readUInt8 = function() {
     var ret = this.buf.readUInt8(this.offset, true);
     this.offset++;
+    return ret;
+};
+
+BufferWrapper.prototype.readUInt16 = function() {
+    var ret = this.buf.readUInt16BE(this.offset, true);
+    this.offset += 2;
     return ret;
 };
 
@@ -60,17 +72,73 @@ BufferWrapper.prototype.readUInt32 = function() {
     var ret = this.buf.readUInt32BE(this.offset, true);
     this.offset += 4;
     return ret;
-}
+};
+
+BufferWrapper.prototype.readString = function() {
+    var len = this.readUInt32();
+    var str = this.buf.toString("utf8", this.offset, this.offset+len);
+    this.offset += len;
+    return str;
+};
+
+var commandAnalyzers = {};
 
 function analyze(s, fulldata, callback) {
     var buf = new BufferWrapper(fulldata);
     var len = buf.readUInt32();
     var command = buf.readUInt8();
 
-    //todo: analyze the rest of the packet
-    
-    callback(s, command);
+    if (command in commandAnalyzers) {
+        callback(s, commandAnalyzers[command](buf));
+    }
 }
+
+commandAnalyzers[1] = function(buf) {
+    return {
+        "type" : "serverinit",
+        "name" : buf.readString(),
+        "desc" : buf.readString(),
+        "players" : buf.readUInt16(),
+        "maxplayers" : buf.readUInt16(),
+        "port": buf.readUInt16(),
+        "password-protected": buf.readBool()
+    };
+};
+
+commandAnalyzers[17] = function(buf) {
+    return {
+        "type" : "playercount-update",
+        "players": buf.readUInt16()
+    };
+};
+
+commandAnalyzers[18] = function(buf) {
+    return {
+        "type" : "serverdesc-update",
+        "desc": buf.readString()
+    };
+};
+
+commandAnalyzers[19] = function(buf) {
+    return {
+        "type" : "servername-update",
+        "name": buf.readString()
+    };
+};
+
+commandAnalyzers[35] = function(buf) {
+    return {
+        "type" : "serversize-update",
+        "maxplayers": buf.readUInt16()
+    };
+};
+
+commandAnalyzers[59] = function(buf) {
+    return {
+        "type" : "serverpass-update",
+        "password-protected": buf.readBool()
+    };
+};
 
 module.exports = {
     addData: addData,

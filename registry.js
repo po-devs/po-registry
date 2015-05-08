@@ -33,15 +33,16 @@ function serverListener(s) {
     var id = freeid(servers);
     console.log("server " + id + " connected");
     servers[id] = s;
+    s.setKeepAlive(true);
     s.on('end', function() {
         console.log('server ' + id + ' disconnected');
         delete servers[id];
         analyze.disconnect(s);
     });
     s.on('data', function(data) {
-        console.log("Server " + id + " sent data of length " + data.length);
+        //console.log("Server " + id + " sent data of length " + data.length);
         analyze.addData(s, data, function(s, command) {
-            console.log("Server " + id + " sent command " + command);
+            console.log("Server " + id + " sent command " + JSON.stringify(command));
         });
     });
 }
