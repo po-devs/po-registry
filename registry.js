@@ -1,4 +1,23 @@
 var net = require('net');
+var redis = require("redis"),
+    redisClient = redis.createClient();
+
+var announcement = "";
+
+redisClient.on("error", function (err) {
+    console.log("Redis Error: " + err);
+});
+
+
+var servers = {};
+
+function freeid(dataSet) {
+    for (var i = 1; ; i++) {
+        if (! (i in dataSet)) {
+            return i;
+        }
+    }
+}
 
 function clientListener(c) {
     console.log('client connected');
@@ -10,9 +29,15 @@ function clientListener(c) {
 }
 
 function serverListener(s) {
-    console.log("server connected");
-    c.on('end', function() {
-        console.log('server disconnected');
+    var id = freeid(servers);
+    console.log("server " + id + " connected");
+    servers[id] = s;
+    s.on('end', function() {
+        console.log('server ' + id + ' disconnected');
+        delete servers[id];
+    });
+    s.on('data', function(data) {
+        console.log("Server " + id + " sent data of length " + data.length);
     });
 }
 
@@ -48,3 +73,19 @@ clientserv2.listen(clientserv2.potag.port, function() { //'listening' listener
 serverserv.listen(serverserv.potag.port, function() {
     console.log("Server listener working on port 8081");
 });
+
+/* Update the announcement every 10 seconds */
+function updateAnnouncement() {
+    redisClient.get("po-registry:announcement", function(err, ann) {
+        if (err) {
+            console.log("Redis error when getting announcement");
+        } else if (announcement != ann) {
+            console.log("Announcement updated: " + ann);
+        } else  {
+            //console.log("no update");
+        }
+        announcement = ann;
+        setTimeout(updateAnnouncement, 10000);
+    });
+}
+updateAnnouncement();

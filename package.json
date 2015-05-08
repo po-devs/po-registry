@@ -18,5 +18,8 @@
   "license": "BSD-2-Clause",
   "bugs": {
     "url": "https://github.com/po-devs/po-registry/issues"
+  },
+  "devDependencies": {
+    "redis": "~0.12.1"
   }
 }
