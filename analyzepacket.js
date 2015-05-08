@@ -6,7 +6,7 @@ var disconnected = new sets.Set();
 
 function addData(s, newdata, callback) {
     var id = s.remoteAddress;
-    var fulldata = id in data ? Buffer.concat(data[id], newdata) : newdata;
+    var fulldata = id in data ? Buffer.concat([data[id], newdata]) : newdata;
     
     /* Todo: instead of creating a new buffer for each command, keep offset in memory and only
         create a new buffer every X or so bytes */

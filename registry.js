@@ -33,6 +33,8 @@ function clientListener(c) {
     c.on('end', function() {
         console.log('client disconnected');
     });
+    c.on('error', function() {
+    });
 
     if (announcement) {
         analyze.write(c, "announcement", announcement);
@@ -48,9 +50,10 @@ function clientListener(c) {
 }
 
 function serverListener(s) {
+    s.on('error', function() {});
     var id = s.remoteAddress;
 
-    if (bannedIps.indexOf(id) != -1) {
+    if (!id || bannedIps.indexOf(id) != -1) {
         console.log("Banned server attempting to log on: " + id);
         s.destroy();
         return;
