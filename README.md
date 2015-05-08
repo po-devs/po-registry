@@ -38,3 +38,9 @@ $ redis-cli
 127.0.0.1:6379> set po-registry:announcement "Hello, Welcome to Pokemon Online!"
 OK
 ```
+
+* `sadd po-registry:banned-ips "XXX.XXX.XXX.XXX"` to add a banned ip
+
+* `srem po-registry:banned-ips "XXX.XXX.XXX.XXX"` to remove a banned ip
+
+* `smembers po-registry:banned-ips` to show banneds ips

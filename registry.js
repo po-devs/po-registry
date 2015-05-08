@@ -5,6 +5,7 @@ var analyze = require("./analyzepacket");
 var extend = require("extend");
 
 var announcement = "";
+var bannedIps = [];
 
 redisClient.on("error", function (err) {
     console.log("Redis Error: " + err);
@@ -22,6 +23,12 @@ var names = {};
 // }
 
 function clientListener(c) {
+    if (bannedIps.indexOf(c.remoteAddress) != -1) {
+        console.log("Banned client attempting to log on: " + c.remoteAddress);
+        c.destroy();
+        return;
+    }
+
     console.log('client connected');
     c.on('end', function() {
         console.log('client disconnected');
@@ -42,17 +49,24 @@ function clientListener(c) {
 
 function serverListener(s) {
     var id = s.remoteAddress;
+
+    if (bannedIps.indexOf(id) != -1) {
+        console.log("Banned server attempting to log on: " + id);
+        s.destroy();
+        return;
+    }
+    
     console.log("server " + id + " connected");
 
     var disconnected = false;
-    function dc() {
+    s.dc = function() {
         disconnected = true;
         s.end();
     }
     if (id in servers) {
         //Todo: send error message to server
         console.log("IP already in use, disconnecting");
-        dc();
+        s.dc();
         return;
     }
     servers[id] = s;
@@ -91,7 +105,7 @@ function serverListener(s) {
                 if (s.podata.name in names) {
                     console.log("Name already in use, disconnecting");
                     //Todo: send error message to server
-                    dc();
+                    s.dc();
                     return;
                 }
 
@@ -103,7 +117,7 @@ function serverListener(s) {
             if (s.podata.name.length == 0) {
                 console.log("Empty name, disconnecting");
                 //Todo: send error message to server
-                dc();
+                s.dc();
                 return;
             }
         });
@@ -158,3 +172,22 @@ function updateAnnouncement() {
     });
 }
 updateAnnouncement();
+
+/* Update the banned IPs every 10 seconds */
+function updateBannedIPs() {
+    redisClient.smembers("po-registry:banned-ips", function(err, banned) {
+        if (err) {
+            console.log("Redis error when getting banned ips");
+        } else {
+            bannedIps = banned;
+            bannedIps.forEach(function(ip) {
+                if (ip in servers) {
+                    servers[ip].dc();
+                }
+            });  
+        }
+        
+        setTimeout(updateBannedIPs, 10000);
+    });
+}
+updateBannedIPs();
