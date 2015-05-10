@@ -21,15 +21,23 @@ var ipcount = {};
 
 function initIp(ip) {
     if (! (ip in antidos) ) {
-        // new client / server! Limit to 20 messages/logins per minute
+        // new client / server! Limit to 40 messages/logins per minute
         // only cache per day
-        antidos[ip] = {"requests": new limiter.RateLimiter(20, 'minute', true),
+        antidos[ip] = { "logins"  : new limiter.RateLimiter(10, 'minute', true),
+                        "requests": new limiter.RateLimiter(40, 'minute', true),
                         "byterate": new limiter.RateLimiter(100*1000, 'minute', true)};
         setTimeout(function() {
             delete antidos[ip];
         }, 24*60*60*1000);
     }
 }
+
+function canLogin(c) {
+    var ip = c.remoteAddress;
+    initIp(ip);
+
+    return antidos[ip].logins.tryRemoveTokens(1);
+};
 
 function canReceive(c) {
     var ip = c.remoteAddress;
@@ -56,12 +64,12 @@ function decIp(ip) {
 
 function clientListener(c) {
     var ip = c.remoteAddress;
-    if (!canReceive(c)) {
+    if (!canLogin(c)) {
         c.destroy();
         return;
     }
     if (bannedIps.indexOf(ip) != -1) {
-        console.log("Banned client attempting to log on: " + ip);
+        console.log("Banned client attempting to log in: " + ip);
         c.destroy();
         return;
     }
@@ -95,7 +103,7 @@ function clientListener(c) {
 function serverListener(s) {
     s.on('error', function() {});
 
-    if (!canReceive(s)) {
+    if (!canLogin(s)) {
         s.destroy();
         return;
     }
