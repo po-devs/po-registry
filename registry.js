@@ -3,9 +3,11 @@ var redis = require("redis"),
     redisClient = redis.createClient();
 var analyze = require("./analyzepacket");
 var extend = require("extend");
+var limiter = require("limiter");
 
 var announcement = "";
 var bannedIps = [];
+
 
 redisClient.on("error", function (err) {
     console.log("Redis Error: " + err);
@@ -14,23 +16,64 @@ redisClient.on("error", function (err) {
 
 var servers = {};
 var names = {};
-// function freeid(dataSet) {
-//     for (var i = 1; ; i++) {
-//         if (! (i in dataSet)) {
-//             return i;
-//         }
-//     }
-// }
+var antidos = {};
+var ipcount = {};
+
+function initIp(ip) {
+    if (! (ip in antidos) ) {
+        // new client / server! Limit to 20 messages/logins per minute
+        // only cache per day
+        antidos[ip] = {"requests": new limiter.RateLimiter(20, 'minute', true),
+                        "byterate": new limiter.RateLimiter(100*1000, 'minute', true)};
+        setTimeout(function() {
+            delete antidos[ip];
+        }, 24*60*60*1000);
+    }
+}
+
+function canReceive(c) {
+    var ip = c.remoteAddress;
+    initIp(ip);
+
+    return antidos[ip].requests.tryRemoveTokens(1);
+};
+
+function canReceiveBytes(c, bytes) {
+    initIp(c.remoteAddress);
+    return antidos[c.remoteAddress].byterate.tryRemoveTokens(bytes);
+};
+
+function incIp(ip) {
+    ipcount[ip] = (ipcount[ip] || 0) + 1; 
+}
+
+function decIp(ip) {
+    ipcount[ip] = (ipcount[ip] || 0) - 1;
+    if (ipcount[ip] <= 0) {
+        delete ipcount[ip];
+    }
+}
 
 function clientListener(c) {
-    if (bannedIps.indexOf(c.remoteAddress) != -1) {
-        console.log("Banned client attempting to log on: " + c.remoteAddress);
+    var ip = c.remoteAddress;
+    if (!canReceive(c)) {
         c.destroy();
         return;
     }
+    if (bannedIps.indexOf(ip) != -1) {
+        console.log("Banned client attempting to log on: " + ip);
+        c.destroy();
+        return;
+    }
+    if (ipcount[ip] > 5) {
+        c.destroy();
+        return;
+    }
+    incIp(ip);
 
     console.log('client connected');
-    c.on('end', function() {
+    c.on('close', function() {
+        decIp(ip);
         console.log('client disconnected');
     });
     c.on('error', function() {
@@ -51,6 +94,12 @@ function clientListener(c) {
 
 function serverListener(s) {
     s.on('error', function() {});
+
+    if (!canReceive(s)) {
+        s.destroy();
+        return;
+    }
+
     var id = s.remoteAddress;
 
     if (!id || bannedIps.indexOf(id) != -1) {
@@ -58,6 +107,11 @@ function serverListener(s) {
         s.destroy();
         return;
     }
+    if (ipcount[id] > 5) {
+        s.destroy();
+        return;
+    }
+    incIp(id);
     
     console.log("server " + id + " connected");
 
@@ -75,9 +129,10 @@ function serverListener(s) {
     servers[id] = s;
     s.podata = {"name": "", "ip": s.remoteAddress};
     s.setKeepAlive(true);
-    s.on('end', function() {
+    s.on('close', function() {
         console.log('server ' + id + ' disconnected');
         delete servers[id];
+        decIp(id);
         if (s.podata.name in names && names[s.podata.name] == s) {
             delete names[s.podata.name];
         }
@@ -88,8 +143,18 @@ function serverListener(s) {
         if (disconnected) {
             return;
         }
+        if (!canReceiveBytes(s, data.length)) {
+            console.log("Server " + id + " sent too many bytes, disconnecting");
+            s.dc();
+            return;
+        }
         //console.log("Server " + id + " sent data of length " + data.length);
         analyze.addData(s, data, function(s, command) {
+            if (!canReceive(s)) {
+                console.log("Server " + id + " sent too many packets, disconnecting");
+                s.dc();
+                return;
+            }
             console.log("Server " + id + " sent command " + JSON.stringify(command));
 
             if ("name" in command && command.name.length > 20) {

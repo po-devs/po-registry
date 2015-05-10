@@ -14,6 +14,12 @@ function addData(s, newdata, callback) {
         var length = fulldata.readUInt32BE(0);
         var fullength = length + 4;
 
+        if (fullength > 100*1000) {
+            /* No reason to read packets so big */
+            s.dc();
+            return;
+        }
+
         if (fulldata.length >= fullength) {
             analyze(s, fulldata, callback);
 
