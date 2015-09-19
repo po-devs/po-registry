@@ -17,10 +17,22 @@ In your project's directory:
 npm install
 ```
 
+### Webserver setup
+
+* Install npm, bower, grunt-cli, redis-server
+* run `npm install` and `bower install` in the root of the repository
+* run `grunt less` and `grunt concat`
+
 ### Running
 
 ```
 nodejs registry.js
+```
+
+If you want a web interface:
+
+```
+nodejs webserver.js
 ```
 
 ### Configuration

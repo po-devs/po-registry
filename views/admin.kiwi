@@ -1,0 +1,21 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Registry admin</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="public/assets/stylesheets/frontend.css">
+  <script src="public/assets/javascript/frontend.js"></script>
+</head>
+<body>
+
+<div class="container">
+  <h1>Registry admin</h1>
+  <hr/>
+  <p>This is your registry</p>
+
+  <p id="console">Banned ips</p>
+</div>
+
+</body>
+</html>
