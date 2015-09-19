@@ -4,6 +4,7 @@ var redis = require("redis"),
 var analyze = require("./analyzepacket");
 var extend = require("extend");
 var limiter = require("limiter");
+var fs = require("fs");
 
 var announcement = "";
 var bannedIps = [];
@@ -63,41 +64,46 @@ function decIp(ip) {
 }
 
 function clientListener(c) {
-    var ip = c.remoteAddress;
-    if (!canLogin(c)) {
-        c.destroy();
-        return;
-    }
-    if (bannedIps.indexOf(ip) != -1) {
-        console.log("Banned client attempting to log in: " + ip);
-        c.destroy();
-        return;
-    }
-    if (ipcount[ip] > 5) {
-        c.destroy();
-        return;
-    }
-    incIp(ip);
+    try {
+        var ip = c.remoteAddress;
+        if (!canLogin(c)) {
+            c.destroy();
+            return;
+        }
+        if (bannedIps.indexOf(ip) != -1) {
+            console.log("Banned client attempting to log in: " + ip);
+            c.destroy();
+            return;
+        }
+        if (ipcount[ip] > 5) {
+            c.destroy();
+            return;
+        }
+        incIp(ip);
 
-    console.log('client connected');
-    c.on('close', function() {
-        decIp(ip);
-        console.log('client disconnected');
-    });
-    c.on('error', function() {
-    });
+        console.log('client connected');
+        c.on('close', function() {
+            decIp(ip);
+            console.log('client disconnected');
+        });
+        c.on('error', function() {
+        });
 
-    if (announcement) {
-        analyze.write(c, "announcement", announcement);
+        if (announcement) {
+            analyze.write(c, "announcement", announcement);
+        }
+        //todo: cache the binary data?
+        for(name in names) {
+            analyze.write(c, "server", names[name].podata);
+        };
+
+        analyze.write(c, "serverend");
+
+        c.end();
+    } catch(err) {
+        fs.appendToFile("reg-errors.txt", err + "\n");
+        fs.appendToFile("reg-errors.txt", err.stack + "\n");
     }
-    //todo: cache the binary data?
-    for(name in names) {
-        analyze.write(c, "server", names[name].podata);
-    };
-
-    analyze.write(c, "serverend");
-
-    c.end();
 }
 
 function serverListener(s) {
