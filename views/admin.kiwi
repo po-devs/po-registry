@@ -12,9 +12,23 @@
 <div class="container">
   <h1>Registry admin</h1>
   <hr/>
-  <p>This is your registry</p>
+  <div class="row">
+    <div class="col-md-6">
+      <h3>Server List</h3>
+      <p>This is your registry</p>
+    </div>
 
-  <p id="console">Banned ips</p>
+    <div class="col-md-6">
+      <h3>Banned IPs</h3>
+      <ul class="list-group">
+        {{each bannedips}}
+          <li class="banned list-group-item list-group-item-danger">${$value}
+            <button type="button" class="btn btn-default btn-sm pull-right">Unban</button>
+          </li>
+        {{/each}}
+      </ul>
+    </div>
+  </div>
 </div>
 
 </body>
