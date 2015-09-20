@@ -101,8 +101,8 @@ function clientListener(c) {
 
         c.end();
     } catch(err) {
-        fs.appendToFile("reg-errors.txt", err + "\n");
-        fs.appendToFile("reg-errors.txt", err.stack + "\n");
+        fs.appendFile("reg-errors.txt", err + "\n");
+        fs.appendFile("reg-errors.txt", err.stack + "\n");
     }
 }
 
