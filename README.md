@@ -5,6 +5,9 @@ A simple registry for Pokemon Online written in nodejs
 
 ```
 sudo apt-get install nodejs npm redis-server
+
+npm install -g bower
+npm install -g grunt-cli
 ```
 
 `redis-server` will install the Redis database. You may need to start it before the registry, if it's not already done automatically, with the command `redis-server`.
