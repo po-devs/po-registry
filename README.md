@@ -38,6 +38,8 @@ If you want a web interface:
 nodejs webserver.js
 ```
 
+You can access the web interface on `localhost:1234/`, `localhost:1234/admin`, `localhost:1234/servers.json`. The official one is [online](http://registry.pokemon-online.eu).
+
 ### Configuration
 
 You can configure the registry through redis. Launch the redis client with the `redis-cli` command.
