@@ -10,7 +10,7 @@
 <body>
 
 <div class="container">
-  <h1>Registry</h1>
+  <h1>Pokemon Online</h1>
   <hr/>
   <div class="col-md-6">
     <h3>Server List</h3>
@@ -22,13 +22,26 @@
           / ${$value.maxplayers}
         {{/if}} | 
         ${$value.ip}:${$value.port}
-          <button type="button" class="btn btn-default btn-sm pull-right">Connect</button>
+          <button type="button" class="btn btn-default btn-sm pull-right" ip='${$value.ip}'>Connect</button>
         </li>
       {{/each}}
     </ul>
   </div>
-
-  <p id="console">Description</p>
+  <div class="col-md-6">
+    <h3>Server description</h3>
+    <iframe src="" sandbox></iframe>
+  </div>
+  <div class="col-md-6">
+     <form class="form-signin">
+        <h3 class="form-signin-heading">Login information</h3>
+        <label for="inputName" class="sr-only">Name</label>
+        <input type="name" id="inputName" class="form-control" placeholder="Name" required autofocus>
+        <label for="inputPassword" class="sr-only">Password</label>
+        <input type="password" id="inputPassword" class="form-control" placeholder="Password" required>
+        
+        <button class="btn btn-default" type="submit" style="margin-top:20px">Connect</button>
+      </form>
+  </div>
 </div>
 
 </body>
