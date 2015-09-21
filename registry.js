@@ -15,8 +15,8 @@ redisClient.on("error", function (err) {
 });
 
 
-var servers = {};
-var names = {};
+var servers = {}; //assoc id/servers
+var names = {};   //assoc name/servers
 var antidos = {};
 var ipcount = {};
 
@@ -180,6 +180,7 @@ function serverListener(s) {
 
             var oldName = s.podata.name;
             extend(s.podata, command);
+            delete s.podata["type"];
 
             if (s.podata.name !== oldName) {
                 delete names[oldName];
@@ -273,3 +274,18 @@ function updateBannedIPs() {
     });
 }
 updateBannedIPs();
+
+/* Update the list of servers in the database every 10 seconds */
+function updateServers() {
+    dataToStore = [];
+
+    for (id in servers) {
+        dataToStore.push(servers[id].podata);
+    }
+
+    dataToStore.sort(function(a,b){return b.players-a.players});
+
+    redisClient.set("po-registry:servers", JSON.stringify(dataToStore));
+    setTimeout(updateServers, 10000);
+}
+updateServers();
