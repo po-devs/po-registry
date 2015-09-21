@@ -10,7 +10,7 @@
 <body>
 
 <div class="container">
-  <h1>Registry admin</h1>
+  <h1>Registry admin <a href="/" class="btn btn-default pull-right">Index</a></h1>
   <hr/>
   <div class="row">
     <div class="col-md-6">

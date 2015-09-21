@@ -33,7 +33,7 @@ var auth = function (req, res, next) {
     return unauthorized(res);
   };
 
-  if (user.name === config.web.user && user.pass === config.web.pass) {
+  if (user.name === config.web.user && user.pass === config.web.password) {
     return next();
   } else {
     return unauthorized(res);
