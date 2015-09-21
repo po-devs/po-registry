@@ -5,6 +5,7 @@ var analyze = require("./analyzepacket");
 var extend = require("extend");
 var limiter = require("limiter");
 var fs = require("fs");
+var config = require("./config.js")
 
 var announcement = "";
 var bannedIps = [];
@@ -24,9 +25,9 @@ function initIp(ip) {
     if (! (ip in antidos) ) {
         // new client / server! Limit to 40 messages/logins per minute
         // only cache per day
-        antidos[ip] = { "logins"  : new limiter.RateLimiter(10, 'minute', true),
-                        "requests": new limiter.RateLimiter(40, 'minute', true),
-                        "byterate": new limiter.RateLimiter(100*1000, 'minute', true)};
+        antidos[ip] = { "logins"  : new limiter.RateLimiter(config.antispam.logins, 'minute', true),
+                        "requests": new limiter.RateLimiter(config.antispam.requests, 'minute', true),
+                        "byterate": new limiter.RateLimiter(config.antispam.byterate, 'minute', true)};
         setTimeout(function() {
             delete antidos[ip];
         }, 24*60*60*1000);

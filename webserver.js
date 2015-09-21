@@ -5,6 +5,8 @@ var express = require('express');
 
 var basicAuth = require('basic-auth');
 
+var config = require('./config.js');
+
 var app = express();
 
 var servers = {}
@@ -31,7 +33,7 @@ var auth = function (req, res, next) {
     return unauthorized(res);
   };
 
-  if (user.name === 'admin' && user.pass === 'admin') {
+  if (user.name === config.web.user && user.pass === config.web.pass) {
     return next();
   } else {
     return unauthorized(res);
@@ -61,7 +63,7 @@ app.get("/unban", auth, function(req, res) {
   res.sendStatus(200);
 });
 
-app.listen(1234);
+app.listen(config.web.port);
 
 /* Update the list of servers from the database every 5 seconds */
 function updateServers() {
