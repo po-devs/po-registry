@@ -20,16 +20,17 @@
     "url": "https://github.com/po-devs/po-registry/issues"
   },
   "devDependencies": {
-    "redis": "~0.12.1",
-    "simplesets": "~1.2.0",
-    "extend": "~2.0.1",
-    "limiter": "~1.0.5",
+    "basic-auth": "^1.0.3",
     "express": "~4.12.3",
+    "extend": "~2.0.1",
     "grunt": "^0.4.5",
     "grunt-contrib-concat": "^0.5.1",
     "grunt-contrib-less": "^1.0.1",
     "grunt-contrib-uglify": "^0.9.1",
     "grunt-contrib-watch": "^0.6.1",
-    "kiwi": "~0.2.2"
+    "kiwi": "~0.2.2",
+    "limiter": "~1.0.5",
+    "redis": "~0.12.1",
+    "simplesets": "~1.2.0"
   }
 }
