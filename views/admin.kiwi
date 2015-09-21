@@ -18,7 +18,7 @@
       <ul class="list-group">
         {{each servers}}
           <li class="banned list-group-item">${$value.name} | Players: ${$value.players} | ${$value.ip}:${$value.port}
-            <button type="button" class="btn btn-default btn-sm pull-right">Ban</button>
+            <button type="button" class="btn btn-default btn-sm pull-right ban-btn" ip="${$value.ip}">Ban</button>
           </li>
         {{/each}}
       </ul>
@@ -29,7 +29,7 @@
       <ul class="list-group">
         {{each bannedips}}
           <li class="banned list-group-item list-group-item-danger">${$value}
-            <button type="button" class="btn btn-default btn-sm pull-right">Unban</button>
+            <button type="button" class="btn btn-default btn-sm pull-right" ip="${$value}">Unban</button>
           </li>
         {{/each}}
       </ul>

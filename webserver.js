@@ -12,6 +12,12 @@ var servers = {}
 console.log(__dirname + '/public');
 app.use("/public", express.static(__dirname + '/public'));
 
+// simple logger
+app.use(function(req, res, next){
+  console.log('%s %s', req.method, req.url);
+  next();
+});
+
 // Synchronous
 var auth = function (req, res, next) {
   function unauthorized(res) {
@@ -42,6 +48,17 @@ app.get("/admin", auth, function(req, res) {
 
 app.get("/servers.json", function(req, res) {
   res.send(JSON.stringify(servers));
+});
+
+app.get("/ban", auth, function(req, res) {
+  redisClient.sadd("po-registry:banned-ips", req.query.ip, redis.print);
+  res.sendStatus(200);
+});
+
+app.get("/unban", auth, function(req, res) {
+  console.log(JSON.stringify(req.query));
+  redisClient.srem("po-registry:banned-ips", req.query.ip, redis.print);
+  res.sendStatus(200);
 });
 
 app.listen(1234);
