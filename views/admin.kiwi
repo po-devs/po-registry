@@ -12,28 +12,26 @@
 <div class="container">
   <h1>Registry admin <a href="/" class="btn btn-default pull-right">Index</a></h1>
   <hr/>
-  <div class="row">
-    <div class="col-md-6">
-      <h3>Server List</h3>
-      <ul class="list-group">
-        {{each servers}}
-          <li class="banned list-group-item">${$value.name} | Players: ${$value.players} | ${$value.ip}:${$value.port}
-            <button type="button" class="btn btn-default btn-sm pull-right ban-btn" ip="${$value.ip}">Ban</button>
-          </li>
-        {{/each}}
-      </ul>
-    </div>
+  <div class="col-md-6">
+    <h3>Server List</h3>
+    <ul class="list-group">
+      {{each servers}}
+        <li class="banned list-group-item">${$value.name} | Players: ${$value.players} | ${$value.ip}:${$value.port}
+          <button type="button" class="btn btn-default btn-sm pull-right ban-btn" ip="${$value.ip}">Ban</button>
+        </li>
+      {{/each}}
+    </ul>
+  </div>
 
-    <div class="col-md-6">
-      <h3>Banned IPs</h3>
-      <ul class="list-group">
-        {{each bannedips}}
-          <li class="banned list-group-item list-group-item-danger">${$value}
-            <button type="button" class="btn btn-default btn-sm pull-right" ip="${$value}">Unban</button>
-          </li>
-        {{/each}}
-      </ul>
-    </div>
+  <div class="col-md-6">
+    <h3>Banned IPs</h3>
+    <ul class="list-group">
+      {{each bannedips}}
+        <li class="banned list-group-item list-group-item-danger">${$value}
+          <button type="button" class="btn btn-default btn-sm pull-right" ip="${$value}">Unban</button>
+        </li>
+      {{/each}}
+    </ul>
   </div>
 </div>
 
