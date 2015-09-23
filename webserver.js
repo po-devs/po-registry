@@ -11,6 +11,8 @@ var app = express();
 
 var servers = {}
 
+var bannedIps = [];
+
 console.log(__dirname + '/public');
 app.use("/public", express.static(__dirname + '/public'));
 
@@ -45,7 +47,7 @@ app.get("/", function(req, res) {
 });
 
 app.get("/admin", auth, function(req, res) {
-  res.render("admin.kiwi", {servers: servers, bannedips:["666.666.666.666", "12.34.56.78"]});
+  res.render("admin.kiwi", {servers: servers, bannedips:bannedIps});
 });
 
 app.get("/servers.json", function(req, res) {
@@ -78,3 +80,19 @@ function updateServers() {
   });
 }
 updateServers();
+
+
+/* Update the banned IPs every 3 seconds */
+function updateBannedIPs() {
+    redisClient.smembers("po-registry:banned-ips", function(err, banned) {
+        if (err) {
+            console.log("Redis error when getting banned ips");
+        } else {
+            bannedIps = banned;
+        }
+        
+        setTimeout(updateBannedIPs, 3000);
+    });
+}
+updateBannedIPs();
+
