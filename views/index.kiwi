@@ -32,7 +32,7 @@
     <iframe src="" sandbox></iframe>
   </div>
   <div class="col-md-6">
-     <form class="form-signin" method=POST action="<filled with javascript>" name="connect" id="connect-form">
+     <form class="form-signin" method=POST action="http://webclient.pokemon-online.eu/" name="connect" id="connect-form">
         <h3 class="form-signin-heading">Login information</h3>
         <label for="user" class="sr-only">Name</label>
         <input type="name" id="user" name="user" class="form-control" placeholder="Name" required autofocus>

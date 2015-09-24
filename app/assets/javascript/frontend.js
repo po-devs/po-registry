@@ -26,12 +26,12 @@ $(function() {
     submitConnectForm();
     return false;
   });
-
-  $("#connect-form").attr("action", "http://webclient.pokemon-online.eu/");
 });
 
 function submitConnectForm() {
-  $("#connect-form").attr("action", $("#connect-form").attr("action") + "?relay=" + $("#relay").val() + "&port=" + $("#port").val()
+  var action = $("#connect-form").attr("action");
+
+  $("#connect-form").attr("action", action.substring(0, action.lastIndexOf("/")+1) + "?relay=" + $("#relay").val() + "&port=" + $("#port").val()
     + "&user=" + $("#user").val());
 
   document.forms["connect"].submit();
