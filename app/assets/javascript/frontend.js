@@ -16,7 +16,7 @@ $(function() {
   });
 
   $(document).on("click", ".connect-btn", function(event) {
-    $('#ip').val($(this).attr('ip'));
+    $('#relay').val($(this).attr('ip'));
     $('#port').val($(this).attr('port'));
 
     submitConnectForm();
@@ -26,6 +26,8 @@ $(function() {
     submitConnectForm();
     return false;
   });
+
+  $("#connect-form").attr("action", "http://webclient.pokemon-online.eu/");
 });
 
 function submitConnectForm() {
