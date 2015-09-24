@@ -27,7 +27,7 @@
       {{/each}}
     </ul>
   </div>
-  <div class="col-md-6">
+  <div class="col-md-6 hidden-xs hidden-sm">
     <h3>Server description</h3>
     <iframe src="" sandbox></iframe>
   </div>
