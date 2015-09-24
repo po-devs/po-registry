@@ -16,13 +16,13 @@
     <h3>Server List</h3>
     <ul class="list-group">
       {{each servers}}
-        <li class="list-group-item">${$value.name} : 
+        <li class="list-group-item server">${$value.name} : 
         <strong>${$value.players}</strong>
         {{if $value.maxplayers}}
           / ${$value.maxplayers}
         {{/if}} players 
         <!--${$value.ip}:${$value.port}-->
-          <button type="button" class="btn btn-default btn-sm pull-right" ip='${$value.ip}'>Connect</button>
+          <button type="button" class="btn btn-default btn-sm pull-right connect-btn" ip='${$value.ip}' port='${$value.port}'>Connect</button>
         </li>
       {{/each}}
     </ul>
@@ -32,14 +32,17 @@
     <iframe src="" sandbox></iframe>
   </div>
   <div class="col-md-6">
-     <form class="form-signin">
+     <form class="form-signin" method=POST action="http://webclient.pokemon-online.eu/" name="connect" id="connect-form">
         <h3 class="form-signin-heading">Login information</h3>
-        <label for="inputName" class="sr-only">Name</label>
-        <input type="name" id="inputName" class="form-control" placeholder="Name" required autofocus>
-        <label for="inputPassword" class="sr-only">Password</label>
-        <input type="password" id="inputPassword" class="form-control" placeholder="Password" required>
+        <label for="user" class="sr-only">Name</label>
+        <input type="name" id="user" name="user" class="form-control" placeholder="Name" required autofocus>
+        <label for="pass" class="sr-only">Password</label>
+        <input type="password" id="pass" name="pass" class="form-control" placeholder="Password">
+
+        <input type="hidden" name="relay" id="relay" value="server.pokemon-online.eu">
+        <input type="hidden" name="port" id="port" value="5080">
         
-        <button class="btn btn-default" type="submit" style="margin-top:20px">Connect</button>
+        <button class="btn btn-default" id="main-connect-button" type="button" style="margin-top:20px">Connect</button>
       </form>
   </div>
 </div>
