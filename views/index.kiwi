@@ -36,8 +36,8 @@
         <h3 class="form-signin-heading">Login information</h3>
         <label for="user" class="sr-only">Name</label>
         <input type="name" id="user" name="user" class="form-control" placeholder="Name" required autofocus>
-        <label for="pass" class="sr-only">Password</label>
-        <input type="password" id="pass" name="pass" class="form-control" placeholder="Password">
+        <!--<label for="pass" class="sr-only">Password</label>
+        <input type="password" id="pass" name="pass" class="form-control" placeholder="Password">-->
 
         <input type="hidden" name="relay" id="relay" value="server.pokemon-online.eu">
         <input type="hidden" name="port" id="port" value="5080">

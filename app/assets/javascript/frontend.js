@@ -30,9 +30,11 @@ $(function() {
 
 function submitConnectForm() {
   var action = $("#connect-form").attr("action");
+  var newAction = action.substring(0, action.lastIndexOf("/")+1) + "?relay=" + $("#relay").val() + "&port=" + $("#port").val()
+    + "&user=" + $("#user").val();
 
-  $("#connect-form").attr("action", action.substring(0, action.lastIndexOf("/")+1) + "?relay=" + $("#relay").val() + "&port=" + $("#port").val()
-    + "&user=" + $("#user").val());
+  $("#connect-form").attr("action", newAction);
 
-  document.forms["connect"].submit();
+  document.location.href = newAction;
+  //document.forms["connect"].submit();
 }
