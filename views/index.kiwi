@@ -45,7 +45,7 @@
         <button class="btn btn-default" id="main-connect-button" type="button" style="margin-top:20px">Connect</button>
 
         <br/>
-        <small>If you can't connect to any servers, you can try <strong><a href="${webclient}/?relay=server.pokemon-online.eu&port=5080&rport=443">this link</a></strong>.</small>
+        <small>If you can't connect to any servers, you can try <strong><a href="${webclient}?relay=server.pokemon-online.eu&port=5080&rport=443">this link</a></strong>.</small>
       </form>
   </div>
 </div>
