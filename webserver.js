@@ -43,7 +43,7 @@ var auth = function (req, res, next) {
 };
 
 app.get("/", function(req, res) {
-  res.render("index.kiwi", {servers: servers});
+  res.render("index.kiwi", {servers: servers, webclient: config.web.webclient});
 });
 
 app.get("/admin", auth, function(req, res) {
