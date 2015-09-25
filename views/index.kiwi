@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Registry</title>
+  <title>List of servers for Pokemon Online</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="public/assets/stylesheets/frontend.css">
@@ -43,6 +43,9 @@
         <input type="hidden" name="port" id="port" value="5080">
         
         <button class="btn btn-default" id="main-connect-button" type="button" style="margin-top:20px">Connect</button>
+
+        <br/>
+        <small>If you can't connect to any servers, you can try <strong><a href="${webclient}/?relay=server.pokemon-online.eu&port=5080&rport=443">this link</a></strong>.</small>
       </form>
   </div>
 </div>
