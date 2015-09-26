@@ -5,6 +5,8 @@ var express = require('express');
 
 var basicAuth = require('basic-auth');
 
+var fs = require('fs');
+
 var config = require('./config.js');
 
 var app = express();
@@ -57,12 +59,16 @@ app.get("/servers.json", function(req, res) {
 app.get("/ban", auth, function(req, res) {
   redisClient.sadd("po-registry:banned-ips", req.query.ip, redis.print);
   res.sendStatus(200);
+
+  fs.appendFile("reg-authlog.txt", "ban " + req.query.ip + ", source: " + req.ip  + "/" + req.hostname + "\n");
 });
 
 app.get("/unban", auth, function(req, res) {
   console.log(JSON.stringify(req.query));
   redisClient.srem("po-registry:banned-ips", req.query.ip, redis.print);
   res.sendStatus(200);
+
+  fs.appendFile("reg-authlog.txt", "unban " + req.query.ip + ", source: " + req.ip  + "/" + req.hostname + "\n");
 });
 
 app.listen(config.web.port);
