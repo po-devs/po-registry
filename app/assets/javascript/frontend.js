@@ -22,10 +22,10 @@ $(function() {
     submitConnectForm();
   });
 
-  $(document).on("click", "#main-connect-button", function(event) {
+  $("#connect-form").submit(function(event) {
+    event.preventDefault();
     submitConnectForm();
-    return false;
-  });
+  })
 });
 
 function submitConnectForm() {
