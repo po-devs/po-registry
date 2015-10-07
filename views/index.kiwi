@@ -42,7 +42,7 @@
         <input type="hidden" name="relay" id="relay" value="server.pokemon-online.eu">
         <input type="hidden" name="port" id="port" value="5080">
         
-        <button class="btn btn-default" id="main-connect-button" type="button" style="margin-top:20px">Connect</button>
+        <button class="btn btn-default" id="main-connect-button" type="submit" style="margin-top:20px">Connect</button>
 
         <br/>
         <small>If you can't connect to any servers, you can try <strong><a href="${webclient}?relay=server.pokemon-online.eu&port=5080&rport=443">this link</a></strong>.</small>
