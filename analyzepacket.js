@@ -11,6 +11,10 @@ function addData(s, newdata, callback) {
     /* Todo: instead of creating a new buffer for each command, keep offset in memory and only
         create a new buffer every X or so bytes */
     while(1) {
+        if (fulldata.length < 4) {
+            data[id] = fulldata;
+            break;
+        }
         var length = fulldata.readUInt32BE(0);
         var fullength = length + 4;
 
