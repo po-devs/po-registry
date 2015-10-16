@@ -26,6 +26,8 @@ $(function() {
     //$(".server-description").contents().find("body").html(desc);
     $(".server-description")[0].src = "data:text/html;charset=utf-8,"+desc;
     //submitConnectForm();
+    window.scrollTo(0, $("#connect-form").offset().top);
+    return false;
   });
 
   $("#connect-form").submit(function(event) {
