@@ -37,6 +37,8 @@ $(function() {
 });
 
 function submitConnectForm() {
+  localStorage.setItem("po.username", $("#user").val());
+
   var action = $("#connect-form").attr("action");
   var newAction = action.substring(0, action.lastIndexOf("/")+1) + "?relay=" + $("#relay").val() + "&port=" + $("#port").val()
     + "&user=" + $("#user").val();
@@ -47,6 +49,6 @@ function submitConnectForm() {
   //document.forms["connect"].submit();
 }
 
-
-
-//  $(".server-description")[0].src = "data:text/html;charset=utf-8,"+$(".server:eq(0)").attr("description");
+$(function() {
+  $("#user").val(localStorage.getItem("po.username") || "");
+});

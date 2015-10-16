@@ -47,7 +47,7 @@
         </div>
         <div class="form-group">
           <label for="user" class="control-label">Name</label>
-          <input type="text" class="form-control" id="user" value="" placeholder="User name">
+          <input type="text" class="form-control" id="user" value="" placeholder="User name" required>
         </div>
         <button class="btn btn-default" id="main-connect-button" type="submit">Connect</button>
         <br/>
