@@ -19,6 +19,8 @@ $(function() {
     $('#relay').val($(this).attr('ip'));
     $('#port').val($(this).attr('port'));
     $('#server-name').val($(this).attr('name'));
+    $(".server").removeClass("active");
+    $(this).addClass("active");
     var desc = $(this).attr("description");
     //console.log("hovered, desc:" + desc);
     //$(".server-description").contents().find("body").html(desc);

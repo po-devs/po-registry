@@ -16,7 +16,7 @@
     <h3>Server List</h3>
     <ul class="list-group">
       {{each servers}}
-        <a class="list-group-item server" href="#connect-form" description="${$value.desc}" ip='${$value.ip}' port='${$value.port}' name='${$value.name}'>${$value.name} : 
+        <a class="list-group-item server {{if $each.first}}active{{/if}}" href="#connect-form" description="${$value.desc}" ip='${$value.ip}' port='${$value.port}' name='${$value.name}'>${$value.name} : 
         <strong>${$value.players}</strong>
         {{if $value.maxplayers}}
           / ${$value.maxplayers}
