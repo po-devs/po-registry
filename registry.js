@@ -21,6 +21,14 @@ var names = {};   //assoc name/servers
 var antidos = {};
 var ipcount = {};
 
+function getIp(c) {
+    var ip = c.remoteAddress;
+    if (ip.indexOf("ffff:") != -1) {
+        ip = ip.substring(ip.indexOf("ffff:")+5);
+    }
+    return ip;
+}
+
 function initIp(ip) {
     if (! (ip in antidos) ) {
         // new client / server! Limit to 40 messages/logins per minute
@@ -35,22 +43,22 @@ function initIp(ip) {
 }
 
 function canLogin(c) {
-    var ip = c.remoteAddress;
+    var ip = getIp(c);
     initIp(ip);
 
     return antidos[ip].logins.tryRemoveTokens(1);
 };
 
 function canReceive(c) {
-    var ip = c.remoteAddress;
+    var ip = getIp(c);
     initIp(ip);
 
     return antidos[ip].requests.tryRemoveTokens(1);
 };
 
 function canReceiveBytes(c, bytes) {
-    initIp(c.remoteAddress);
-    return antidos[c.remoteAddress].byterate.tryRemoveTokens(bytes);
+    initIp(getIp(c));
+    return antidos[getIp(c)].byterate.tryRemoveTokens(bytes);
 };
 
 function incIp(ip) {
@@ -66,7 +74,7 @@ function decIp(ip) {
 
 function clientListener(c) {
     try {
-        var ip = c.remoteAddress;
+        var ip = getIp(c);
         if (!canLogin(c)) {
             c.destroy();
             return;
@@ -115,7 +123,7 @@ function serverListener(s) {
         return;
     }
 
-    var id = s.remoteAddress;
+    var id = getIp(s);
 
     if (!id || bannedIps.indexOf(id) != -1) {
         console.log("Banned server attempting to log on: " + id);
@@ -142,7 +150,7 @@ function serverListener(s) {
         return;
     }
     servers[id] = s;
-    s.podata = {"name": "", "ip": s.remoteAddress};
+    s.podata = {"name": "", "ip": getIp(s)};
     s.setKeepAlive(true);
     s.on('close', function() {
         console.log('server ' + id + ' disconnected');
