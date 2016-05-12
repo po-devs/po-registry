@@ -161,6 +161,9 @@ function serverListener(s) {
         }
         analyze.disconnect(s);
     });
+    s.on('error', function() {
+        //on close is called anyway right after this
+    });
     s.on('data', function(data) {
         //Ignore data from connections we closed
         if (disconnected) {
