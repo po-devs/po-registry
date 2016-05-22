@@ -79,6 +79,7 @@ function decIp(ip) {
 }
 
 function clientListener(c) {
+    c.on('error', function() {});
     try {
         var ip = getIp(c);
         if (!canLogin(c)) {
@@ -100,8 +101,6 @@ function clientListener(c) {
         c.on('close', function() {
             decIp(ip);
             console.log('client disconnected');
-        });
-        c.on('error', function() {
         });
 
         if (announcement) {
@@ -166,9 +165,6 @@ function serverListener(s) {
             delete names[s.podata.name];
         }
         analyze.disconnect(s);
-    });
-    s.on('error', function() {
-        //on close is called anyway right after this
     });
     s.on('data', function(data) {
         //Ignore data from connections we closed
