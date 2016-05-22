@@ -23,6 +23,9 @@ var ipcount = {};
 
 function getIp(c) {
     var ip = c.remoteAddress;
+    if (!ip) {
+        return null;
+    }
     if (ip.indexOf("ffff:") != -1) {
         ip = ip.substring(ip.indexOf("ffff:")+5);
     }
@@ -44,6 +47,9 @@ function initIp(ip) {
 
 function canLogin(c) {
     var ip = getIp(c);
+    if (!ip) {
+        return false;
+    }
     initIp(ip);
 
     return antidos[ip].logins.tryRemoveTokens(1);
