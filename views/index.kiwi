@@ -7,6 +7,10 @@
   <link rel="stylesheet" href="public/assets/stylesheets/frontend.css">
   <link rel="icon" type="image/png" href="public/favicon.png">
   <script src="public/assets/javascript/frontend.js"></script>
+  <meta property="og:title" content="Pokémon Online - List of Servers">
+  <meta property="og:image" content="public/favicon.png">
+  <meta property="og:url" content="http://servers.pokemon-online.eu">
+  <meta property="og:description" content="Play Pokémon in your browser. Ready your teams and join a server to battle other trainers in the various tiers available.">
 </head>
 <body>
 
