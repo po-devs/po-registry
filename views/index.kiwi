@@ -31,7 +31,7 @@
     <h3>Server description</h3>
     <div class="well well-sm">
       {{if servers.length > 0}}
-        <iframe class="server-description" src="data:text/html;charset=utf-8,${servers[0].desc}" sandbox></iframe>
+        <iframe class="server-description" src="data:text/html;charset=utf-8,<html><head></head><body style='font-family:\"Helvetica Neue\",Helvetica,Arial,sans-serif'>${servers[0].desc}</body></html>" sandbox></iframe>
       {{else}}
         <iframe class="server-description" sandbox></iframe>
       {{/if}}

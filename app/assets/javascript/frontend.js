@@ -24,7 +24,8 @@ $(function() {
     var desc = $(this).attr("description");
     //console.log("hovered, desc:" + desc);
     //$(".server-description").contents().find("body").html(desc);
-    $(".server-description")[0].src = "data:text/html;charset=utf-8,"+desc;
+    $(".server-description")[0].src = "data:text/html;charset=utf-8,<html><head></head><body style='font-family:\"Helvetica Neue\",Helvetica,Arial,sans-serif'>"
+       +desc + "</body></html>";
     //submitConnectForm();
     window.scrollTo(0, $("#connect-form").offset().top);
     return false;
