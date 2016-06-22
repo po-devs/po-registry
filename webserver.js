@@ -49,19 +49,18 @@ app.get("/", function(req, res) {
 });
 
 app.get("/admin", auth, function(req, res) {
-  var toInt = (ip) => {
-    var parts = ip.split(".");
-    var tot = 0;
+  res.render("admin.kiwi", {servers: servers, bannedips:bannedIps.sort(function(a,b) {
+    var parts1 = a.split(".");
+    var parts2 = b.split(".");
 
-    parts.forEach((part) => {
-      tot <<= 8;
-      tot += +part;
-    });
+    for (var i = 0; i < parts1.length && i < parts2.length; i++) {
+      if (parts1[i] != parts2[i]) {
+        return (+parts1[i])-(+parts2[i]);
+      }
+    }
 
-    return tot;
-  };
-
-  res.render("admin.kiwi", {servers: servers, bannedips:bannedIps.sort(function(a,b) {return toInt(a) - toInt(b);})});
+    return parts1.length - parts2.length;
+  })});
 });
 
 app.get("/servers.json", function(req, res) {
