@@ -284,7 +284,7 @@ function updateBannedIPs() {
             });  
         }
         
-        setTimeout(updateBannedIPs, 10000);
+        setTimeout(updateBannedIPs, 5000);
     });
 }
 updateBannedIPs();

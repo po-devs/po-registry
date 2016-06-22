@@ -49,7 +49,19 @@ app.get("/", function(req, res) {
 });
 
 app.get("/admin", auth, function(req, res) {
-  res.render("admin.kiwi", {servers: servers, bannedips:bannedIps});
+  var toInt = (ip) => {
+    var parts = ip.split(".");
+    var tot = 0;
+
+    parts.forEach((part) => {
+      tot <<= 8;
+      tot += +part;
+    });
+
+    return tot;
+  };
+
+  res.render("admin.kiwi", {servers: servers, bannedips:bannedIps.sort(function(a,b) {return toInt(a) - toInt(b);})});
 });
 
 app.get("/servers.json", function(req, res) {
