@@ -303,3 +303,8 @@ function updateServers() {
     setTimeout(updateServers, 10000);
 }
 updateServers();
+
+process.on('unhandledRejection', error => {
+  // Will print "unhandledRejection err is not defined"
+  console.log('unhandledRejection', error.message);
+});
