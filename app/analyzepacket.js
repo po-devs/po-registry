@@ -41,7 +41,7 @@ function addData(s, newdata, callback) {
 		}
 	}
 
-	if (disconnected.size() > 0) {
+	if (disconnected.size > 0) {
 		disconnected.clear();
 	}
 }
