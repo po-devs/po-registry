@@ -96,31 +96,22 @@ app.listen(config.web.port);
 
 /* Update the list of servers from the database every 5 seconds */
 function updateServers() {
-	redisClient.get("po-registry:servers", function (err, servs) {
-		if (err) {
-			console.log("Redis error when getting servers");
-		} else {
-			servers = JSON.parse(servs);
-		}
-
-		setTimeout(updateServers, 5000);
+	redisClient.get("po-registry:servers").then((servs) => {
+		servers = JSON.parse(servs);
 	});
 }
-updateServers();
+setInterval(updateServers, 5_000);
 
 /* Update the banned IPs every 3 seconds */
 function updateBannedIPs() {
-	redisClient.sMembers("po-registry:banned-ips", function (err, banned) {
-		if (err) {
-			console.log("Redis error when getting banned ips");
-		} else {
+	redisClient
+		.sMembers("po-registry:banned-ips")
+		.then((banned) => {
 			bannedIps = banned;
-		}
-
-		setTimeout(updateBannedIPs, 3000);
-	});
+		})
+		.catch(console.error);
 }
-updateBannedIPs();
+setInterval(updateServers, 3_000);
 
 process.on("unhandledRejection", (error) => {
 	// Will print "unhandledRejection err is not defined"

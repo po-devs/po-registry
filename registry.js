@@ -194,7 +194,7 @@ function serverListener(s) {
 				command.desc = command.desc.substring(0, 500);
 			}
 
-			var oldName = s.podata.name;
+			const oldName = s.podata.name;
 			Object.assign(s.podata, command);
 			delete s.podata["type"];
 
@@ -223,11 +223,11 @@ function serverListener(s) {
 	});
 }
 
-var clientserv = net.createServer(clientListener);
+const clientserv = net.createServer(clientListener);
 clientserv.potag = { name: "Client serv 1", port: 5090 };
-var clientserv2 = net.createServer(clientListener);
+const clientserv2 = net.createServer(clientListener);
 clientserv2.potag = { name: "Client serv 2", port: 8080 };
-var serverserv = net.createServer(serverListener);
+const serverserv = net.createServer(serverListener);
 serverserv.potag = { name: "Server serv", port: 8081 };
 
 var servs = [clientserv, clientserv2, serverserv];
@@ -269,10 +269,9 @@ function updateAnnouncement() {
 			//console.log("no update");
 		}
 		announcement = ann;
-		setTimeout(updateAnnouncement, 10000);
 	});
 }
-updateAnnouncement();
+setInterval(updateAnnouncement, 10_000);
 
 /* Update the banned IPs every 10 seconds */
 function updateBannedIPs() {
@@ -287,11 +286,9 @@ function updateBannedIPs() {
 				}
 			});
 		}
-
-		setTimeout(updateBannedIPs, 5000);
 	});
 }
-updateBannedIPs();
+setInterval(updateBannedIPs, 5_000);
 
 /* Update the list of servers in the database every 10 seconds */
 function updateServers() {
