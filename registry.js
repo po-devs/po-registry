@@ -110,16 +110,16 @@ function clientListener(c) {
 			analyze.write(c, "announcement", announcement);
 		}
 		//todo: cache the binary data?
-		for (name in names) {
-			analyze.write(c, "server", names[name].podata);
+		for (const server of Object.values(names)) {
+			analyze.write(c, "server", server.podata);
 		}
 
 		analyze.write(c, "serverend");
 
 		c.end();
 	} catch (err) {
-		fs.appendFile("reg-errors.txt", err + "\n");
-		fs.appendFile("reg-errors.txt", err.stack + "\n");
+		console.error(err);
+		fs.promises.appendFile("reg-errors.txt", err + "\n" + err.stack + "\n").catch(console.error);
 	}
 }
 
