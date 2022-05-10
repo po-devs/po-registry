@@ -20,13 +20,13 @@
   <div class="col-md-6">
     <h3>Server List</h3>
     <ul class="list-group">
-      {{each servers}}
-        <a class="list-group-item server {{if $each.first}}active{{/if}}" href="#connect-form" description="${$value.desc}" ip='${$value.ip}' port='${$value.port}' name='${$value.name}'>${$value.name} : 
-        <strong>${$value.players}</strong>
-        {{if $value.maxplayers}}
-          / ${$value.maxplayers}
+      {{#each servers}}
+        <a class="list-group-item server {{#if @index}}{{else}}active{{/if}}" href="#connect-form" description="{{this.desc}}" ip='{{this.ip}}' port='{{this.port}}' name='{{this.name}}'>{{this.name}} : 
+        <strong>{{this.players}}</strong>
+        {{#if this.maxplayers}}
+          / {{this.maxplayers}}
         {{/if}} players 
-        <!--${$value.ip}:${$value.port}-->
+        <!--{{this.ip}}:{{this.port}}-->
         </a>
       {{/each}}
     </ul>
@@ -34,21 +34,21 @@
   <div class="col-md-6 hidden-xs hidden-sm">
     <h3>Server description</h3>
     <div class="well well-sm">
-      {{if servers.length > 0}}
-        <iframe class="server-description" src="data:text/html;charset=utf-8,<html><head></head><body style='font-family:&quot;Helvetica Neue&quot;,Helvetica,Arial,sans-serif'>${servers[0].desc}</body></html>" sandbox></iframe>
+      {{#if hasServers}}
+        <iframe class="server-description" src="data:text/html;charset=utf-8,<html><head></head><body style='font-family:&quot;Helvetica Neue&quot;,Helvetica,Arial,sans-serif'>{{servers.0.desc}}</body></html>" sandbox></iframe>
       {{else}}
         <iframe class="server-description" sandbox></iframe>
       {{/if}}
     </div>
   </div>
   <div class="col-md-6">
-     <form class="form-signin" method=POST action="${webclient}" name="connect" id="connect-form">
+     <form class="form-signin" method=POST action="{{webclient}}" name="connect" id="connect-form">
         <h3 class="form-signin-heading">Login information</h3>
         <input type="hidden" name="relay" id="relay" value="server.pokemon-online.eu">
         <input type="hidden" name="port" id="port" value="5080">
         <div class="form-group">
           <label for="server-name" class="control-label">Server</label>
-          <input type="text" class="form-control" id="server-name" value="{{if servers.length > 0}}${servers[0].name}{{/if}}" placeholder="Server Name" disabled="">
+          <input type="text" class="form-control" id="server-name" value="{{#if hasServers}}{{servers.0.name}}{{/if}}" placeholder="Server Name" disabled="">
         </div>
         <div class="form-group">
           <label for="user" class="control-label">Name</label>
@@ -56,7 +56,7 @@
         </div>
         <button class="btn btn-default" id="main-connect-button" type="submit">Connect</button>
         <br/>
-        <small>If you can't connect to any servers, you can try <strong><a href="${webclient}?relay=server.pokemon-online.eu&port=5080&rport=443">this link</a></strong>.</small>
+        <small>If you can't connect to any servers, you can try <strong><a href="{{webclient}}?relay=server.pokemon-online.eu&port=5080&rport=443">this link</a></strong>.</small>
       </form>
   </div>
 </div>

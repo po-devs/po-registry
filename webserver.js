@@ -1,119 +1,128 @@
-var redis = require("redis"),
-    redisClient = redis.createClient();
+import { createClient } from "redis";
+import express from "express";
+import { engine } from "express-handlebars";
+import basicAuth from "basic-auth";
+import fs from "fs";
+import url from "url";
+import config from "./app/config.js";
 
-var express = require('express');
+const app = express();
 
-var basicAuth = require('basic-auth');
+let servers = {};
+let bannedIps = [];
 
-var fs = require('fs');
+const redisClient = createClient();
 
-var config = require('./config.js');
+redisClient.connect();
 
-var app = express();
+const __dirname = url.fileURLToPath(new URL(".", import.meta.url));
 
-var servers = {}
-
-var bannedIps = [];
-
-console.log(__dirname + '/public');
-app.use("/public", express.static(__dirname + '/public'));
+app.use("/public", express.static(__dirname + "/public"));
+app.engine("handlebars", engine());
+app.set("view engine", "handlebars");
 
 // simple logger
-app.use(function(req, res, next){
-  console.log('%s %s', req.method, req.url);
-  next();
+app.use(function (req, res, next) {
+	console.log(req.method, req.url);
+	next();
 });
 
 // Synchronous
-var auth = function (req, res, next) {
-  function unauthorized(res) {
-    res.set('WWW-Authenticate', 'Basic realm=Authorization Required');
-    return res.sendStatus(401);
-  };
+function auth(req, res, next) {
+	function unauthorized(res) {
+		res.set("WWW-Authenticate", "Basic realm=Authorization Required");
+		return res.sendStatus(401);
+	}
 
-  var user = basicAuth(req);
+	var user = basicAuth(req);
 
-  if (!user || !user.name || !user.pass) {
-    return unauthorized(res);
-  };
+	if (!user || !user.name || !user.pass) {
+		return unauthorized(res);
+	}
 
-  if (user.name === config.web.user && user.pass === config.web.password) {
-    return next();
-  } else {
-    return unauthorized(res);
-  };
-};
+	if (user.name === config.web.user && user.pass === config.web.password) {
+		return next();
+	} else {
+		return unauthorized(res);
+	}
+}
 
-app.get("/", function(req, res) {
-  res.render("index.kiwi", {servers: servers, webclient: config.web.webclient});
+app.get("/", function (req, res) {
+	res.render("index.handlebars", {
+		servers: servers,
+		hasServers: servers.length > 0,
+		webclient: config.web.webclient,
+	});
 });
 
-app.get("/admin", auth, function(req, res) {
-  res.render("admin.kiwi", {servers: servers, bannedips:bannedIps.sort(function(a,b) {
-    var parts1 = a.split(".");
-    var parts2 = b.split(".");
+app.get("/admin", auth, function (req, res) {
+	res.render("admin.handlebars", {
+		servers: servers,
+		bannedips: bannedIps.sort(function (a, b) {
+			var parts1 = a.split(".");
+			var parts2 = b.split(".");
 
-    for (var i = 0; i < parts1.length && i < parts2.length; i++) {
-      if (parts1[i] != parts2[i]) {
-        return (+parts1[i])-(+parts2[i]);
-      }
-    }
+			for (var i = 0; i < parts1.length && i < parts2.length; i++) {
+				if (parts1[i] != parts2[i]) {
+					return +parts1[i] - +parts2[i];
+				}
+			}
 
-    return parts1.length - parts2.length;
-  })});
+			return parts1.length - parts2.length;
+		}),
+	});
 });
 
-app.get("/servers.json", function(req, res) {
-  res.send(JSON.stringify(servers));
+app.get("/servers.json", function (req, res) {
+	res.json(servers);
 });
 
-app.get("/ban", auth, function(req, res) {
-  redisClient.sadd("po-registry:banned-ips", req.query.ip, redis.print);
-  res.sendStatus(200);
+app.get("/ban", auth, function (req, res) {
+	redisClient.sAdd("po-registry:banned-ips", req.query.ip, redis.print);
+	res.sendStatus(200);
 
-  fs.appendFile("reg-authlog.txt", "ban " + req.query.ip + ", source: " + req.ip  + "/" + req.hostname + "\n");
+	fs.appendFile("reg-authlog.txt", "ban " + req.query.ip + ", source: " + req.ip + "/" + req.hostname + "\n");
 });
 
-app.get("/unban", auth, function(req, res) {
-  console.log(JSON.stringify(req.query));
-  redisClient.srem("po-registry:banned-ips", req.query.ip, redis.print);
-  res.sendStatus(200);
+app.get("/unban", auth, function (req, res) {
+	console.log(JSON.stringify(req.query));
+	redisClient.sRem("po-registry:banned-ips", req.query.ip, redis.print);
+	res.sendStatus(200);
 
-  fs.appendFile("reg-authlog.txt", "unban " + req.query.ip + ", source: " + req.ip  + "/" + req.hostname + "\n");
+	fs.appendFile("reg-authlog.txt", "unban " + req.query.ip + ", source: " + req.ip + "/" + req.hostname + "\n");
 });
 
 app.listen(config.web.port);
 
 /* Update the list of servers from the database every 5 seconds */
 function updateServers() {
-  redisClient.get("po-registry:servers", function(err, servs) {
-    if (err) {
-      console.log("Redis error when getting servers");
-    } else {
-      servers = JSON.parse(servs);
-    }
-    
-    setTimeout(updateServers, 5000);
-  });
+	redisClient.get("po-registry:servers", function (err, servs) {
+		if (err) {
+			console.log("Redis error when getting servers");
+		} else {
+			servers = JSON.parse(servs);
+		}
+
+		setTimeout(updateServers, 5000);
+	});
 }
 updateServers();
 
-
 /* Update the banned IPs every 3 seconds */
 function updateBannedIPs() {
-    redisClient.smembers("po-registry:banned-ips", function(err, banned) {
-        if (err) {
-            console.log("Redis error when getting banned ips");
-        } else {
-            bannedIps = banned;
-        }
-        
-        setTimeout(updateBannedIPs, 3000);
-    });
+	redisClient.sMembers("po-registry:banned-ips", function (err, banned) {
+		if (err) {
+			console.log("Redis error when getting banned ips");
+		} else {
+			bannedIps = banned;
+		}
+
+		setTimeout(updateBannedIPs, 3000);
+	});
 }
 updateBannedIPs();
 
-process.on('unhandledRejection', error => {
-  // Will print "unhandledRejection err is not defined"
-  console.log('unhandledRejection', error.message);
+process.on("unhandledRejection", (error) => {
+	// Will print "unhandledRejection err is not defined"
+	console.log("unhandledRejection", error.message);
 });

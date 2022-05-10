@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "description": "A simple registry for Pokemon Online",
   "main": "registry.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -28,9 +29,12 @@
     "grunt-contrib-less": "^1.0.1",
     "grunt-contrib-uglify": "^0.9.1",
     "grunt-contrib-watch": "^0.6.1",
-    "kiwi": "~0.2.2",
     "limiter": "~1.0.5",
-    "redis": "~0.12.1",
     "simplesets": "~1.2.0"
+  },
+  "dependencies": {
+    "dotenv": "^16.0.1",
+    "express-handlebars": "^6.0.5",
+    "redis": "^4.1.0"
   }
 }
