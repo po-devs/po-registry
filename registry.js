@@ -296,11 +296,7 @@ updateBannedIPs();
 
 /* Update the list of servers in the database every 10 seconds */
 function updateServers() {
-	let dataToStore = [];
-
-	for (id in servers) {
-		dataToStore.push(servers[id].podata);
-	}
+	const dataToStore = Object.values(servers).map((server) => server.podata);
 
 	dataToStore.sort(function (a, b) {
 		return b.players - a.players;
