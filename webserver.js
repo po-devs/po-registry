@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { createClient } from "redis";
 import express from "express";
 import { engine } from "express-handlebars";
