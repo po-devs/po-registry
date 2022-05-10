@@ -2,7 +2,6 @@ import net from "net";
 import { createClient } from "redis";
 
 import analyze from "./app/analyzepacket.js";
-import extend from "extend";
 import limiter from "limiter";
 import fs from "fs";
 import config from "./app/config.js";
@@ -196,7 +195,7 @@ function serverListener(s) {
 			}
 
 			var oldName = s.podata.name;
-			extend(s.podata, command);
+			Object.assign(s.podata, command);
 			delete s.podata["type"];
 
 			if (s.podata.name !== oldName) {
