@@ -22,7 +22,7 @@
 	},
 	"devDependencies": {
 		"basic-auth": "^1.0.3",
-		"express": "~4.12.3",
+		"express": "~4.17.3",
 		"grunt": "^0.4.5",
 		"grunt-contrib-concat": "^0.5.1",
 		"grunt-contrib-less": "^1.0.1",
